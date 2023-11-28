@@ -5,8 +5,13 @@ export function activate(context: vscode.ExtensionContext) {
   const persistenceKey = "vscode-spotify-player.authentication.tokens";
 
   const spotify = new SpotifyClient(
-    "http://localhost:3000/authorize",
-    "http://localhost:3000/token",
+    {
+      clientId: "",
+      redirectUri: "vscode://gustavosvalentim.vscode-spotify-player",
+      authorizeEndpoint: "https://accounts.spotify.com/authorize",
+      tokenEndpoint: "https://accounts.spotify.com/api/token",
+      scopes: ["user-modify-playback-state", "user-read-playback-state"],
+    },
     async () => {
       return context.globalState.get(persistenceKey) as
         | SpotifyAuthenticationState
@@ -28,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (shouldOpenWithBrowser) {
         await vscode.env.openExternal(
-          vscode.Uri.parse(spotify.authorizeEndpoint)
+          vscode.Uri.parse(await spotify.getAuthorizeEndpoint())
         );
       }
     }

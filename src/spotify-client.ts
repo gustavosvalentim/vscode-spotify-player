@@ -1,3 +1,7 @@
+import { OAuth2Client } from "./oauth2/client";
+import { generateCodeChallenge, generateCodeVerifier } from "./oauth2/encoding";
+import { OAuth2Config } from "./oauth2/types";
+
 export type SpotifyClientConfig = {
   clientId: string;
   clientSecret: string;
@@ -22,6 +26,7 @@ export type SpotifyAuthenticationState = {
   accessToken: string;
   expiresAt: number;
   refreshToken?: string;
+  codeVerifier?: string;
   error?: Error;
 };
 
@@ -56,6 +61,7 @@ export class HttpClient {
 }
 
 export class SpotifyClient {
+  private readonly authClient: OAuth2Client;
   private readonly httpClient: HttpClient;
   private readonly apiUrl: string = "https://api.spotify.com";
 
@@ -67,8 +73,7 @@ export class SpotifyClient {
   public readonly player: SpotifyPlayerClient;
 
   public constructor(
-    public readonly authorizeEndpoint: string,
-    public readonly tokenEndpoint: string,
+    authConfig: OAuth2Config,
     getInitialState?: () => Promise<SpotifyAuthenticationState | undefined>
   ) {
     if (getInitialState) {
@@ -82,6 +87,7 @@ export class SpotifyClient {
           throw e;
         });
     }
+    this.authClient = new OAuth2Client(authConfig);
     this.httpClient = new HttpClient(this.apiUrl);
     this.httpClient.addHandler(
       async (params: RequestInit): Promise<RequestInit> => {
@@ -104,30 +110,43 @@ export class SpotifyClient {
     this.player = new SpotifyPlayerClient(this.httpClient);
   }
 
+  public async getAuthorizeEndpoint(): Promise<string> {
+    if (!this.authenticationState) {
+      this.authenticationState = {
+        accessToken: "",
+        expiresAt: 0,
+      };
+    }
+
+    const codeVerifier = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(codeVerifier);
+
+    this.authenticationState.codeVerifier = codeVerifier;
+
+    return this.authClient.getAuthorizeEndpoint({
+      code_challenge_method: "S256",
+      code_challenge: challenge,
+    });
+  }
+
   public async authenticate(code?: string): Promise<void> {
     let authResponse: TokenEndpointResponse;
-    if (!this.authenticationState || code) {
+    if (code) {
       // authorization code flow
       if (!code) {
         throw new Error("missing parameter code");
       }
-      const response = await fetch(this.tokenEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
+      authResponse = await this.authClient.exchangeCode(code, {
+        codeVerifier: this.authenticationState!.codeVerifier,
       });
-      authResponse = (await response.json()) as TokenEndpointResponse;
     } else {
       // refresh token
-      const response = await fetch(this.tokenEndpoint, {
-        method: "POST",
-        body: JSON.stringify({
-          refreshToken: this.authenticationState.refreshToken!,
-        }),
-      });
-      authResponse = (await response.json()) as TokenEndpointResponse;
+      if (!this.authenticationState) {
+        return;
+      }
+      authResponse = await this.authClient.refreshToken(
+        this.authenticationState.refreshToken!
+      );
     }
 
     if (authResponse.error) {
