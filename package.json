@@ -30,12 +30,13 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
+    "vscode:prepublish": "pnpm run esbuild",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "watch": "tsc --watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "esbuild": "node build.mjs"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.2",
@@ -48,5 +49,8 @@
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "esbuild": "^0.19.8"
   }
 }

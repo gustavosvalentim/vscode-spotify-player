@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      esbuild:
+        specifier: ^0.19.8
+        version: 0.19.8
     devDependencies:
       '@types/mocha':
         specifier: ^10.0.2
