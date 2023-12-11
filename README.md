@@ -1,29 +1,32 @@
 # VSCode Spotify Player
 
-Control your Spotify using VSCode.
+VSCode Spotify Player is a Visual Studio Code extension that enables you to control your Spotify directly within the VSCode environment.
 
 ## Features
 
-- Get the currently playing song
-- Play the next song
+- **Get Currently Playing Song:** Retrieve information about the currently playing song.
+- **Play the Next Song:** Skip to the next song in your Spotify queue.
 
-### TBD
+## TBD
 
-- Search for songs
-- Play a playlist
+- **Search for Songs:** Search and play songs.
+- **Play a Playlist:** Search and play a playlist.
 
 ## Requirements
 
-- [pnpm]()
-- [NodeJS]()
+Make sure you have the following prerequisites installed before using the extension:
 
-## Setup and configuration
+- [pnpm](https://pnpm.io/) - Package manager for Node.js projects.
+- [Node.js](https://nodejs.org/) - JavaScript runtime.
 
-Before running the extension, you will need to create an app on Spotify. If you need help with creating an app on Spotify, you can follow this [guide](https://developer.spotify.com/documentation/web-api/concepts/apps).
+## Setup and Configuration
+
+Before running the extension, you need to create a Spotify app. Follow the [official guide](https://developer.spotify.com/documentation/web-api/concepts/apps) to create your app on the Spotify Developer Dashboard.
 
 ### Configuration
 
-To run the extension on VSCode, change the following settings on `.vscode/tasks.json`
+1. Open `.vscode/tasks.json` in your VSCode workspace.
+2. Update the following settings with your Spotify app details:
 
 ```json
 {
@@ -31,7 +34,7 @@ To run the extension on VSCode, change the following settings on `.vscode/tasks.
 }
 ```
 
-### Dependencies
+### Install dependencies
 
 ```sh
 pnpm install
@@ -39,7 +42,7 @@ pnpm install
 
 ### Build
 
-Before building you need to set the environment variables on the system you are building.
+Before building, ensure you have set the required environment variables on your system. Build the extension using:
 
 ```sh
 pnpm build
@@ -47,8 +50,6 @@ pnpm build
 
 ## Release Notes
 
-### 0.0.1
+### Version 0.0.1
 
-Initial release
-
----
+- Initial release
