@@ -1,71 +1,54 @@
-# extension README
+# VSCode Spotify Player
 
-This is the README for your extension "extension". After writing up a brief description, we recommend including the following sections.
+Control your Spotify using VSCode.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- Get the currently playing song
+- Play the next song
 
-For example if there is an image subfolder under your extension project workspace:
+### TBD
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Search for songs
+- Play a playlist
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- [pnpm]()
+- [NodeJS]()
 
-## Extension Settings
+## Setup and configuration
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Before running the extension, you will need to create an app on Spotify. If you need help with creating an app on Spotify, you can follow this [guide](https://developer.spotify.com/documentation/web-api/concepts/apps).
 
-For example:
+### Configuration
 
-This extension contributes the following settings:
+To run the extension on VSCode, change the following settings on `.vscode/tasks.json`
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+```json
+{
+  "SPOTIFY_CLIENT_ID": "YOUR-CLIENT-ID"
+}
+```
 
-## Known Issues
+### Dependencies
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+```sh
+pnpm install
+```
+
+### Build
+
+Before building you need to set the environment variables on the system you are building.
+
+```sh
+pnpm build
+```
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial release
 
 ---
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

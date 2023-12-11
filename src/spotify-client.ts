@@ -24,16 +24,17 @@ export type RequestFunc = (
 ) => Promise<Response>;
 
 export class SpotifyClient {
-  public readonly player: SpotifyPlayerClient;
+  public readonly player: SpotifyPlayer;
 
   public constructor(
     private readonly getToken: () => Promise<string | undefined>
   ) {
-    this.player = new SpotifyPlayerClient(this.request.bind(this));
+    this.player = new SpotifyPlayer(this.request.bind(this));
   }
 
   private async request(path: string, config?: RequestInit): Promise<Response> {
     const token = await this.getToken();
+    console.log("token", token);
     return fetch("https://api.spotify.com" + path, {
       ...config,
       headers: {
@@ -43,7 +44,7 @@ export class SpotifyClient {
   }
 }
 
-export class SpotifyPlayerClient {
+export class SpotifyPlayer {
   public constructor(private readonly request: RequestFunc) {}
 
   public async getPlaybackState(): Promise<PlaybackState> {
@@ -54,6 +55,11 @@ export class SpotifyPlayerClient {
     } catch (e) {
       console.error(e);
       throw e;
+    }
+
+    if (200 !== response.status) {
+      console.error("status is not 200", response.status);
+      throw new Error("could not get player data");
     }
 
     const { item, device, progress_ms, is_playing } =

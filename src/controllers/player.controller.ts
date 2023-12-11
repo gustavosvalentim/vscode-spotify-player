@@ -9,6 +9,9 @@ export class PlayerController {
       const playbackState = await this.client.player.getPlaybackState();
 
       if (!playbackState.isPlaying) {
+        await vscode.window.showInformationMessage(
+          "Your are not listening to anything"
+        );
         return;
       }
 

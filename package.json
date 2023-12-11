@@ -10,8 +10,10 @@
     "Other"
   ],
   "publisher": "gustavosvalentim",
-  "activationEvents": [],
-  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/main.js",
   "author": "gustavosvalentim",
   "contributes": {
     "commands": [
@@ -30,13 +32,14 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run esbuild",
-    "compile": "tsc -p ./",
-    "watch": "tsc --watch -p ./",
-    "pretest": "pnpm run compile && pnpm run lint",
+    "build-base": "esbuild src/extension.ts --define:process.env.SPOTIFY_CLIENT_ID=\\\"$SPOTIFY_CLIENT_ID\\\" --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "vscode:prepublish": "pnpm run build-base --minify",
+    "build": "pnpm run build-base --sourcemap",
+    "watch": "pnpm run build-base --sourcemap --watch",
+    "pretest": "pnpm run build && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "esbuild": "node build.mjs"
+    "test-compile": "tsc -p ./"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.2",
@@ -45,12 +48,10 @@
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
     "@vscode/test-electron": "^2.3.4",
+    "esbuild": "^0.19.8",
     "eslint": "^8.50.0",
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
     "typescript": "^5.2.2"
-  },
-  "dependencies": {
-    "esbuild": "^0.19.8"
   }
 }
