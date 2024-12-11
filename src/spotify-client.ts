@@ -18,40 +18,85 @@ export type PlaybackState = {
   isPlaying: boolean;
 };
 
+export type Track = {
+  album: { type: "album" | "single" | "compilation"; name: string };
+  artists: { name: string }[];
+  name: string;
+  uri: string;
+};
+
+export type Tracks = {
+  next?: string;
+  previous?: string;
+  total: number;
+  items: Track[];
+};
+
+export enum ItemType {
+  album,
+  artist,
+  playlist,
+  track,
+  show,
+  episode,
+  audiobook,
+}
+
+export type SearchResult = {
+  tracks: Tracks;
+};
+
 export type RequestFunc = (
   url: string,
   config?: RequestInit
 ) => Promise<Response>;
 
-export class SpotifyClient {
-  public readonly player: SpotifyPlayer;
+export class HttpClient {
+  public baseUrl?: string;
+  public config: RequestInit;
 
-  public constructor(
-    private readonly getToken: () => Promise<string | undefined>
-  ) {
-    this.player = new SpotifyPlayer(this.request.bind(this));
+  public onError?: (response: Response, client: HttpClient) => Promise<void>;
+
+  public constructor(baseUrl?: string, config?: RequestInit) {
+    this.baseUrl = baseUrl ?? "";
+    this.config = { ...config };
   }
 
-  private async request(path: string, config?: RequestInit): Promise<Response> {
-    const token = await this.getToken();
-    console.log("token", token);
-    return fetch("https://api.spotify.com" + path, {
+  public async request(url: string, config?: RequestInit): Promise<Response> {
+    const response = await fetch(this.baseUrl + url, {
+      ...this.config,
       ...config,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
+
+    if (!response.ok && this.onError) {
+      await this.onError(response, this);
+    }
+
+    return response;
+  }
+}
+
+export class SpotifyClient {
+  private readonly _httpClient: HttpClient;
+
+  public readonly player: SpotifyPlayer;
+  public readonly library: SpotifyLibrary;
+
+  public constructor(httpClient: HttpClient) {
+    this._httpClient = httpClient;
+    this.player = new SpotifyPlayer(this._httpClient);
+    this.library = new SpotifyLibrary(this._httpClient);
   }
 }
 
 export class SpotifyPlayer {
-  public constructor(private readonly request: RequestFunc) {}
+  public constructor(private readonly httpClient: HttpClient) {}
 
   public async getPlaybackState(): Promise<PlaybackState> {
     let response: Response;
 
     try {
-      response = await this.request("/v1/me/player");
+      response = await this.httpClient.request("/v1/me/player");
     } catch (e) {
       console.error(e);
       throw e;
@@ -77,14 +122,70 @@ export class SpotifyPlayer {
     };
   }
 
+  public async play(uri: string): Promise<void> {
+    try {
+      await this.httpClient.request("/v1/me/player/play", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uris: [uri],
+        }),
+      });
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
   public async playNext(): Promise<void> {
     try {
-      await this.request("/v1/me/player/next", {
+      await this.httpClient.request("/v1/me/player/next", {
         method: "POST",
       });
     } catch (e) {
       console.error(e);
       throw e;
     }
+  }
+}
+
+export class SpotifyLibrary {
+  public constructor(private readonly httpClient: HttpClient) {}
+
+  /**
+   * TODO: Add pagination
+   */
+  public async search(
+    query: string,
+    type?: ItemType,
+    signal?: AbortSignal
+  ): Promise<SearchResult> {
+    const queryParams = new URLSearchParams({
+      q: query,
+      type: type ? ItemType[type] : ItemType[ItemType.track],
+    });
+
+    try {
+      const response = await this.httpClient.request(
+        "/v1/search?" + queryParams.toString(),
+        {
+          method: "GET",
+          signal,
+        }
+      );
+      const responseBody = await response.json();
+      return responseBody as SearchResult;
+    } catch (e) {
+      console.error(`Error searching for query \`${query}\``, e);
+    }
+
+    return {
+      tracks: {
+        total: 0,
+        items: [],
+      },
+    };
   }
 }

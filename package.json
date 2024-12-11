@@ -18,8 +18,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-spotify-player.authenticationUrl",
-        "title": "Spotify Player: Authentication URL"
+        "command": "vscode-spotify-player.signIn",
+        "title": "Spotify Player: Sign In"
       },
       {
         "command": "vscode-spotify-player.getCurrentlyPlaying",
@@ -28,6 +28,10 @@
       {
         "command": "vscode-spotify-player.playNext",
         "title": "Spotify Player: Play next"
+      },
+      {
+        "command": "vscode-spotify-player.searchAndPlay",
+        "title": "Spotify Player: Search and play a song"
       }
     ]
   },
