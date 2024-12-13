@@ -14,7 +14,7 @@
 			},
 			"options": {
 				"env": {
-					"SPOTIFY_CLIENT_ID": ""
+					"SPOTIFY_CLIENT_ID": "YOUR-CLIENT-ID"
 				}
 			}
 		}

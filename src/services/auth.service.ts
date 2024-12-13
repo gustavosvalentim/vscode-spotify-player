@@ -38,22 +38,34 @@ export class AuthService {
     };
   }
 
+  private getTokenEndpointConfiguration(code: string, codeVerifier: string) {
+    let params = new URLSearchParams({
+      client_id: this.config.clientId,
+      redirect_uri: this.config.redirectUri,
+      grant_type: "authorization_code",
+      code_verifier: codeVerifier || "",
+      code: code || "",
+    });
+    return {
+      params,
+      url: this.config.accountsUrl + "/api/token",
+    };
+  }
+
   public async getToken(
     code: string,
     codeVerifier: string
   ): Promise<TokenResponse> {
-    const response = await fetch(this.config.accountsUrl + "/api/token", {
+    const configuration = this.getTokenEndpointConfiguration(
+      code,
+      codeVerifier
+    );
+    const response = await fetch(configuration.url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({
-        client_id: this.config.clientId,
-        redirect_uri: this.config.redirectUri,
-        grant_type: "authorization_code",
-        code_verifier: codeVerifier || "",
-        code: code || "",
-      }),
+      body: configuration.params,
     });
     return (await response.json()) as TokenResponse;
   }
