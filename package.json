@@ -2,7 +2,7 @@
   "name": "vscode-spotify-player",
   "displayName": "vscode-spotify-player",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.84.0"
   },

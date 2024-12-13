@@ -46,11 +46,6 @@ export type SearchResult = {
   tracks: Tracks;
 };
 
-export type RequestFunc = (
-  url: string,
-  config?: RequestInit
-) => Promise<Response>;
-
 export class HttpClient {
   public baseUrl?: string;
   public config: RequestInit;

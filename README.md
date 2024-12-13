@@ -60,6 +60,10 @@ pnpm build
 
 ## 📝 Release Notes
 
+### Version 0.0.2
+
+- Added `Search and play` command
+
 ### Version 0.0.1
 
 - Initial release
