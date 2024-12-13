@@ -121,9 +121,6 @@ export class SpotifyPlayer {
     try {
       await this.httpClient.request("/v1/me/player/play", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           uris: [uri],
         }),

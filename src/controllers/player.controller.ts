@@ -72,6 +72,7 @@ export class PlayerController {
         quickPick.items = result.tracks.items.map((track) => ({
           label: track.name,
           description: track.artists.map((a) => a.name).join(", "),
+          detail: track.uri,
           alwaysShow: true,
         }));
       } catch (err: any) {
